@@ -1,8 +1,8 @@
 import pyperclip
 
-chord_name = "Ab13"
+chord_name = "B"
 fret_shift = None
-chord_input = "64r 50r 44 13r [1-2]1"
+chord_input = "51 43 33 23 1x 6x"
 
 def parse_pair(pair: str):
     parsed_pair = []
