@@ -2,7 +2,23 @@ import pyperclip
 
 chord_name = "Ab13"
 fret_shift = None
-chord_input = "64 5x 44 33 [1-2]1"
+chord_input = "64r 50r 44 13r [1-2]1"
+
+def parse_pair(pair: str):
+    parsed_pair = []
+    for s in pair:
+        if s.isdigit():
+            parsed_pair.append(int(s))
+        else:
+            parsed_pair.append(s)
+    return parsed_pair
+            
+def root(pair: list):
+    root_base = f"\\color{{red}}"
+    if len(pair) > 2 and pair[2] == "r":
+        return root_base
+    else:
+        return ""
 
 def gen_katex_chord(chord_name, fret_shift, chord_input):
     chord_input = chord_input.split(" ")
@@ -24,26 +40,20 @@ def gen_katex_chord(chord_name, fret_shift, chord_input):
         # swap barre_start and barre_end if barre_start > barre_end
         if barre_input_start > barre_input_end:
             barre_input_start, barre_input_end = barre_input_end, barre_input_start
-        # calculate barrer position and length
-        barrer_length = 2.25*(barre_input_end - barre_input_start + 1)-0.25
-        barrer_shift = -0.875*(barre_input_end - barre_input_start + 1)+1.025
-        barrer_length = f'{barrer_length:.2f}'
-        barrer_shift = f'{barrer_shift:.2f}'
-
-    # root note
-    root_note_input = [pair for pair in chord_input if 'r' in pair]
-    if len(root_note_input) > 0:
-        root_note_input = root_note_input[0] # TODO: draw root note
+        # calculate barre position and length
+        barre_length = 2.25*(barre_input_end - barre_input_start + 1)-0.25
+        barre_shift = -0.875*(barre_input_end - barre_input_start + 1)+1.025
+        barre_length = f'{barre_length:.2f}'
+        barre_shift = f'{barre_shift:.2f}'
 
     # single frets
-    frets_input = [pair for pair in chord_input if "-" not in pair and "x" not in pair and "0" not in pair and "r" not in pair]
-    frets_input = [[int(pair[0]), int(pair[1])] for pair in frets_input]
+    frets_input = [pair for pair in chord_input if "-" not in pair and "x" not in pair and "0" not in pair]
+    frets_input = [parse_pair(pair) for pair in frets_input]
 
     line_base = "{}&{}&{}&{}&{}"
-    root = ""
-    dot_base = "{{{}}}\\llap{{$\\raisebox{{-0.15em}}{{$\\large{{\\bull}}\\kern{{0.05em}}$}}$}}"
-    barrer_base = "{{{}}}\\llap{{$\\rule[0pt]{{{}ex}}{{1ex}}\\kern{{{}em}}$}} "
-
+    
+    dot_base = "{{}}\\llap{{${}\\raisebox{{-0.15em}}{{$\\large{{\\bull}}\\kern{{0.05em}}$}}$}}"
+    barre_base = "{{}}\\llap{{$\\rule[0pt]{{{}ex}}{{1ex}}\\kern{{{}em}}$}} "
 
 
     # how many frets to draw
@@ -51,26 +61,27 @@ def gen_katex_chord(chord_name, fret_shift, chord_input):
     if len(barre_input) > 0:
         max_fret = max(max_fret, barre_input_fret)
 
-    fret_draw = max(max_fret, 3)
+    fret_draw = max(max_fret, 3) # draw at least 3 frets
 
     fret_shift_raise = f'{0.5*fret_draw-0.5:.2f}'
     marker_raise = f"{0.5*fret_draw+0.5:.2f}"
 
     # open strings markers
-    open_strings_input = [[int(pair[0]), pair[1]] for pair in chord_input if "x" in pair or "0" in pair]
-    open_string_pieces = "\\raisebox{{{}}}{{$\\sixptsize{{{}}}\\kern{{{}em}}$}}"
+    open_strings_input = [parse_pair(pair) for pair in chord_input if "x" in pair or "0" in pair]
+    open_string_pieces = "\\raisebox{{{}}}{{${}\\sixptsize{{{}}}\\kern{{{}em}}$}}"
     chord_open_strings = []
 
+    # draw open strings markers
     for pair in open_strings_input:
         if pair[1] == "x":
             marker = "×"
-        elif pair[1] == "0":
+        elif pair[1] == 0:
             marker = "○"
         else:
             marker = " "
         open_string_marker_shift = 1.65*pair[0]-10.9
         open_string_marker_shift = f'{open_string_marker_shift:.2f}'
-        chord_open_strings.append(open_string_pieces.format(f"{marker_raise}em", marker, open_string_marker_shift))
+        chord_open_strings.append(open_string_pieces.format(f"{marker_raise}em", root(pair), marker, open_string_marker_shift))
 
     chord_open_strings = "".join(chord_open_strings)
 
@@ -78,16 +89,19 @@ def gen_katex_chord(chord_name, fret_shift, chord_input):
     for fret in range(1, fret_draw+1): # for eath fret (row)
         line_tail = "\\\\ \\hline" if fret != fret_draw else ""
         pieces = ["" for _ in range(7)]
+        # draw barre
         if len(barre_input) > 0 and barre_input_fret == fret:
-            # calculate barrer position and length
-            pieces[barre_input_end] = barrer_base.format(root, barrer_length, barrer_shift) 
+            # calculate barre position and length
+            pieces[barre_input_end] = barre_base.format(barre_length, barre_shift) 
+
+        # draw single frets
         for fret_input in frets_input: # for each fret input
             # dealing with single notes
             if fret_input[1] == fret:
                 if fret_input[0] != 1:
-                    pieces[fret_input[0]] += dot_base.format(root) 
+                    pieces[fret_input[0]] += dot_base.format(root(fret_input)) 
                 elif fret_input[0] == 1: # string 1 - need to use string 2
-                    pieces[2] += "{{{}}}\\llap{{$\\raisebox{{-0.15em}}{{$\\large{{\\bull}}$\\kern{{-0.9em}}}}$}}".format(root)
+                    pieces[2] += "{{}}\\llap{{${}\\raisebox{{-0.15em}}{{$\\large{{\\bull}}$\\kern{{-0.9em}}}}$}}".format(root(fret_input))
         lines.append(line_base.format(pieces[6], pieces[5], pieces[4], pieces[3], pieces[2]) + line_tail)
 
     lines[-1] = lines[-1].replace(line_tail, "") # 最后一行不需要封闭线
@@ -107,7 +121,7 @@ def gen_katex_chord(chord_name, fret_shift, chord_input):
     \\end{{array}}}}
     """
     
-    print(chord)
+    # print(chord)
     pyperclip.copy(chord)
     return chord
 
