@@ -11,16 +11,25 @@ class Api:
     
     def error(self):
         raise Exception("An error occurred in Python")
+    
+    def close_window(self):
+        webview.windows[0].destroy()
+    
+    # minimize window
+    def minimize_window(self):
+        webview.windows[0].minimize()
 
 window = webview.create_window(
     title="Katex Guitar Chord",
-    url = "assets/index.html",
+    url = "../build/index.html",
     js_api=Api(),
-    width=700,
-    height=600,
+    width=800,
+    height=500,
     resizable=False,
     text_select=True,
     confirm_close=True,
+    frameless=True,
+    easy_drag=False,
 )
 
 webview.start()

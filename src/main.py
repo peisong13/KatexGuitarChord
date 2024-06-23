@@ -2,7 +2,7 @@ import pyperclip
 
 chord_name = "B"
 fret_shift = None
-chord_input = "51 43 33 23 1x 6x"
+chord_input = "[1-6]1"
 
 def parse_pair(pair: str):
     parsed_pair = []
@@ -57,7 +57,10 @@ def gen_katex_chord(chord_name, fret_shift, chord_input):
 
 
     # how many frets to draw
-    max_fret = max([pair[1] for pair in frets_input])
+    if len(frets_input) == 0:
+        max_fret = 0
+    else:
+        max_fret = max([pair[1] for pair in frets_input])
     if len(barre_input) > 0:
         max_fret = max(max_fret, barre_input_fret)
 
