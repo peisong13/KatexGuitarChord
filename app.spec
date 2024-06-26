@@ -3,11 +3,11 @@
 block_cipher = None
 
 a = Analysis(
-    ['src/view.py'],
-    pathex=['.'],
+    ['src/view.py', 'src/main.py'],
+    pathex=['.', 'G:/Python312'],
     binaries=[],
     datas=[
-        ('build/**/*', 'build')
+        ('src/build/', 'build')
     ],
     hiddenimports=[],
     hookspath=[],
@@ -28,10 +28,10 @@ exe = EXE(
     name='Katex Guitar Chord',
     debug=False,
     bootloader_ignore_signals=False,
-    strip=False,
+    strip=True,
     upx=True,
     console=False,
-    icon='src/KatexGuitarChord_logo.ico',
+    icon='src/logo.ico',
 )
 
 coll = COLLECT(

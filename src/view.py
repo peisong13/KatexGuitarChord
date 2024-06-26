@@ -1,5 +1,6 @@
 import webview
 from main import gen_katex_chord
+import os
 
 class Api:
     def __init__(self):
@@ -19,17 +20,22 @@ class Api:
     def minimize_window(self):
         webview.windows[0].minimize()
 
-window = webview.create_window(
-    title="Katex Guitar Chord",
-    url = "../build/index.html",
-    js_api=Api(),
-    width=800,
-    height=500,
-    resizable=False,
-    text_select=True,
-    confirm_close=True,
-    frameless=True,
-    easy_drag=False,
-)
+if __name__ == "__main__":
+    # Create a webview window
+    print(os.path.dirname(os.path.abspath(__file__)))
+    url_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "build/index.html")
+    print(url_path)
+    window = webview.create_window(
+        title="Katex Guitar Chord",
+        url = url_path,
+        js_api=Api(),
+        width=800,
+        height=500,
+        resizable=False,
+        text_select=True,
+        confirm_close=True,
+        frameless=True,
+        easy_drag=False,
+    )
 
-webview.start()
+    webview.start()
