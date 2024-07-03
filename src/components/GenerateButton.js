@@ -10,6 +10,10 @@ const GenerateButton = ( props ) => {
             latexOutput.innerHTML = (window).katex.renderToString(latexChord, {
                 throwOnError: false
             });
+            // copy katex to clipboard
+            if (inputCopyToClipboard) {
+                (window).pywebview.api.copy_to_clipboard_api(latexChord).then(()=>{})
+            }
         }
         ).catch(function(error) {
             console.error("API Error:", error);

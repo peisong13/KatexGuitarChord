@@ -41,7 +41,8 @@ function App() {
             inputChordNotes={inputChordNotes} 
             inputCopyToClipboard={inputCopyToClipboard} 
             outputKatex={outputKatex} 
-            setOutputKatex={setOutputKatex}/>
+            setOutputKatex={setOutputKatex}
+            />
         </Stack>
           <Outputs sx={{ flex: 1 }} outputKatex={outputKatex} setOutputKatex={setOutputKatex}/>
       </Stack>

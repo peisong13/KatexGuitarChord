@@ -1,4 +1,4 @@
-import pyperclip
+# import pyperclip
 
 chord_name = "B"
 fret_shift = None
@@ -125,7 +125,7 @@ def gen_katex_chord(chord_name, fret_shift, chord_input):
     """
     
     # print(chord)
-    pyperclip.copy(chord)
+    # pyperclip.copy(chord)
     return chord
 
 if __name__ == "__main__":

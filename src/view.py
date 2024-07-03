@@ -1,5 +1,6 @@
 import webview
 from main import gen_katex_chord
+import pyperclip
 import os
 
 class Api:
@@ -19,6 +20,10 @@ class Api:
     # minimize window
     def minimize_window(self):
         webview.windows[0].minimize()
+
+    def copy_to_clipboard_api(self, text):
+        print('copying to clipboard')
+        pyperclip.copy(text)
 
 if __name__ == "__main__":
     # Create a webview window
